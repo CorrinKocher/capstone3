@@ -1,4 +1,5 @@
 ﻿using System;
+using TenmoClient.APIClients;
 using TenmoClient.Data;
 
 namespace TenmoClient
@@ -7,6 +8,7 @@ namespace TenmoClient
     {
         private readonly ConsoleService consoleService = new ConsoleService();
         private readonly AuthService authService = new AuthService();
+        private readonly AccountService accountService = new AccountService();
 
         private bool shouldExit = false;
 
@@ -75,7 +77,10 @@ namespace TenmoClient
                     switch (menuSelection)
                     {
                         case 1:
-                            Console.WriteLine("NOT IMPLEMENTED!"); // TODO: Implement me
+                            LoginUser loginUser = consoleService.PromptForLogin();
+                            //API_User user = UserService.UserId();
+                            GetBalance(loginUser.Username);
+
                             break;
                         case 2:
                             Console.WriteLine("NOT IMPLEMENTED!"); // TODO: Implement me
@@ -126,6 +131,21 @@ namespace TenmoClient
                 {
                     UserService.SetLogin(user);
                 }
+            }
+        }
+
+        private void GetBalance(string username)
+        {
+            API_Account account = accountService.GetBalance(username);
+
+
+            if (account != null)
+            {
+                Console.WriteLine(account);
+            }
+            else
+            {
+                Console.WriteLine("The account number is not found.");
             }
         }
     }

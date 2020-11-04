@@ -16,25 +16,30 @@ namespace TenmoServer.DAO
             connectionString = dbConnectionString;
         }
 
-        public ReturnUser GetBalance(int userId)
+        public ReturnUser GetBalance(string username)
         {
+            
+
             using (SqlConnection conn = new SqlConnection(connectionString))
             {
                 conn.Open();
 
-                SqlCommand cmd = new SqlCommand("SELECT balance FROM accounts WHERE user_id = @userId", conn);
-                cmd.Parameters.AddWithValue("@userId", userId);
+                SqlCommand cmd = new SqlCommand("SELECT users.user_id, users.username, accounts.account_id, accounts.balance FROM users JOIN accounts ON users.user_id = accounts.user_id  WHERE users.username = @username", conn);
+                cmd.Parameters.AddWithValue("@username", username);
 
                 SqlDataReader reader = cmd.ExecuteReader();
 
-                if (reader.Read())
+                if (reader.HasRows)
                 {
+                    reader.Read();
+
                     return GetUserFromReader(reader);
+                   
                 }
 
 
             }
-            return 0;
+            return null;
         }
 
         private ReturnUser GetUserFromReader(SqlDataReader reader)

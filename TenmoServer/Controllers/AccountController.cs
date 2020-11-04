@@ -20,16 +20,19 @@ namespace TenmoServer.Controllers
         }
 
         [HttpGet]
-        public ActionResult<ReturnUser> GetBalance(int accountId)
+        public ActionResult<ReturnUser> GetBalance(string username)
         {
-            Balance balance = this.accountDAO.GetBalance(accountId);
+            ReturnUser user = new ReturnUser();
 
-            if (balance == null)
+         
+            user = this.accountDAO.GetBalance(username);
+
+            if (user == null)
             {
                 return NotFound();
             }
 
-            return Ok(balance);
+            return Ok(user);
         }
 
     }
