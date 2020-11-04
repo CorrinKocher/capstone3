@@ -9,5 +9,10 @@
         public string Username { get; set; }
         //public string Role { get; set; }
         public string Token { get; set; }
+
+        public int AccountId { get; set; }
+
+        public decimal AccountBalance { get; set; }
+
     }
 }
