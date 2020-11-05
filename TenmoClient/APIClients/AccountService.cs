@@ -14,7 +14,7 @@ namespace TenmoClient.APIClients
 
         public AccountService()
         {
-            this.BASE_URL = AuthService.API_BASE_URL + "accounts";
+            this.BASE_URL = AuthService.API_BASE_URL + "account";
 
             this.client = new RestClient();
         }
@@ -33,7 +33,7 @@ namespace TenmoClient.APIClients
 
         public API_Account GetBalance(string username)
         {
-            RestRequest request = new RestRequest(BASE_URL + "/{username}");
+            RestRequest request = new RestRequest(BASE_URL + "/" + username);
 
             var response = client.Get<API_Account>(request);
             

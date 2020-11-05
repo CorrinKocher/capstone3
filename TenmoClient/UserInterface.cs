@@ -77,9 +77,7 @@ namespace TenmoClient
                     switch (menuSelection)
                     {
                         case 1:
-                            LoginUser loginUser = consoleService.PromptForLogin();
-                            //API_User user = UserService.UserId();
-                            GetBalance(loginUser.Username);
+                            GetBalance(UserService.Username);
 
                             break;
                         case 2:

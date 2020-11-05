@@ -19,7 +19,7 @@ namespace TenmoServer.Controllers
             this.accountDAO = accountDAO;
         }
 
-        [HttpGet]
+        [HttpGet("{username}")]
         public ActionResult<ReturnUser> GetBalance(string username)
         {
             ReturnUser user = new ReturnUser();

@@ -19,6 +19,14 @@ namespace TenmoClient
             }
         }
 
+        public static string Username
+        {
+            get
+            {
+                return user.Username;
+            }
+        }
+
         public static bool IsLoggedIn
         {
             get
