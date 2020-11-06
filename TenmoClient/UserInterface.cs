@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using TenmoClient.APIClients;
 using TenmoClient.Data;
 
@@ -60,9 +61,9 @@ namespace TenmoClient
                 Console.WriteLine("Welcome to TEnmo! Please make a selection: ");
                 Console.WriteLine("1: View your current balance");
                 Console.WriteLine("2: View your past transfers");
-                Console.WriteLine("3: View your pending requests");
+                Console.WriteLine("3: View your pending requests");// not required
                 Console.WriteLine("4: Send TE bucks");
-                Console.WriteLine("5: Request TE bucks");
+                Console.WriteLine("5: Request TE bucks");// not required!!!
                 Console.WriteLine("6: Log in as different user");
                 Console.WriteLine("0: Exit");
                 Console.WriteLine("---------");
@@ -87,7 +88,10 @@ namespace TenmoClient
                             Console.WriteLine("NOT IMPLEMENTED!"); // TODO: Implement me
                             break;
                         case 4:
-                            Console.WriteLine("NOT IMPLEMENTED!"); // TODO: Implement me
+                            GetListOfUsers();
+                            TransferMoney(UserService.Username);
+                            
+
                             break;
                         case 5:
                             Console.WriteLine("NOT IMPLEMENTED!"); // TODO: Implement me
@@ -128,6 +132,7 @@ namespace TenmoClient
                 if (user != null)
                 {
                     UserService.SetLogin(user);
+                    accountService.UpdateToken(user.Token);
                 }
             }
         }
@@ -139,12 +144,57 @@ namespace TenmoClient
 
             if (account != null)
             {
-                Console.WriteLine(account);
+                string accountString = $"Your account balance is: ${account.AccountBalance}";
+                Console.WriteLine(accountString);
             }
             else
             {
                 Console.WriteLine("The account number is not found.");
             }
         }
+
+        private void GetListOfUsers()
+        {
+            List<API_Account> accounts = accountService.GetListOfUsers();
+            foreach (API_Account account in accounts)
+            {
+                if (account.Username != UserService.Username)
+                {
+                    string accountNameAndUserId = $"{account.UserId} ) Username: {account.Username}";
+                    Console.WriteLine(accountNameAndUserId);
+                }
+            }
+        }
+
+        private int SelectUserToReceiveTransfer()
+        {
+            Console.WriteLine("Please enter the ID of the user you would like to transfer to (ex: 3000)");
+            int userIdSelected = int.Parse(Console.ReadLine());
+            return userIdSelected;
+        }
+
+        private decimal SelectAmtToTransfer()
+        {
+            Console.WriteLine("Please enter the decimal amount of how much money you would like to transfer (ex: 12.00)");
+            decimal amtToTransfer = decimal.Parse(Console.ReadLine());
+            return amtToTransfer;
+        }
+
+        private void TransferMoney(string username)
+        {
+            bool isSufficient;
+            int receivingUser = SelectUserToReceiveTransfer();
+            decimal amtToTransfer = SelectAmtToTransfer();
+            API_Account account = accountService.GetBalance(username);
+            API_Transfer transfer = new API_Transfer(account.AccountId, receivingUser, amtToTransfer);           
+            isSufficient = accountService.RequestToTransferToAnotherAccount(username, amtToTransfer, transfer);
+            while (!isSufficient)
+            {
+                SelectAmtToTransfer();
+                Console.WriteLine($"You do not have sufficient funds for the transfer, your current balance is  ${account.AccountBalance}.");
+            }
+
+        }
+    
     }
 }

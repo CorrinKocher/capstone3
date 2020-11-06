@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,9 +11,11 @@ namespace TenmoServer.Controllers
 {
     [Route("[controller]")]
     [ApiController]
+    [Authorize]
     public class AccountController : ControllerBase
     {
-        private readonly IAccountDAO accountDAO;
+        private readonly IAccountDAO accountDAO; 
+        private readonly ITransferDAO transferDAO;
 
         public AccountController(IAccountDAO accountDAO)
         {
@@ -20,12 +23,12 @@ namespace TenmoServer.Controllers
         }
 
         [HttpGet("{username}")]
-        public ActionResult<ReturnUser> GetBalance(string username)
+        public ActionResult<ReturnUser> GetReturnUser(string username)
         {
             ReturnUser user = new ReturnUser();
 
-         
-            user = this.accountDAO.GetBalance(username);
+
+            user = this.accountDAO.GetReturnUser(username);
 
             if (user == null)
             {
@@ -35,5 +38,20 @@ namespace TenmoServer.Controllers
             return Ok(user);
         }
 
+        
+        [HttpGet]
+
+        public ActionResult<List<ReturnUser>> ListOfAccounts()
+        {
+         return this.accountDAO.ListOfUsers();
+                        
+        }
+
+        [HttpPost]
+
+        public ActionResult<Transfer> InsertTransfer(int sendingAccountId, int receivingAccountId, decimal amtToTransfer, int transferType = 1001, int transferStatus = 2001)
+        {
+            return this.transferDAO.TransferMoney(sendingAccountId, receivingAccountId, amtToTransfer, transferType, transferStatus);
+        }
     }
 }

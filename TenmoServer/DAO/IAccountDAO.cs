@@ -8,6 +8,8 @@ namespace TenmoServer.DAO
 {
     public interface IAccountDAO
     {
-        ReturnUser GetBalance(string username);
+        ReturnUser GetReturnUser(string username);
+
+        List<ReturnUser> ListOfUsers();
     }
 }

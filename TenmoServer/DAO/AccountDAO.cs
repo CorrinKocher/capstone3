@@ -10,15 +10,16 @@ namespace TenmoServer.DAO
     public class AccountDAO : IAccountDAO
     {
         private readonly string connectionString;
+        
 
         public AccountDAO(string dbConnectionString)
         {
             connectionString = dbConnectionString;
         }
 
-        public ReturnUser GetBalance(string username)
+        public ReturnUser GetReturnUser(string username)
         {
-            
+
 
             using (SqlConnection conn = new SqlConnection(connectionString))
             {
@@ -34,7 +35,7 @@ namespace TenmoServer.DAO
                     reader.Read();
 
                     return GetUserFromReader(reader);
-                   
+
                 }
 
 
@@ -52,5 +53,43 @@ namespace TenmoServer.DAO
                 AccountBalance = Convert.ToDecimal(reader["balance"])
             };
         }
+
+        public List<ReturnUser> ListOfUsers()
+        {
+
+            List<ReturnUser> returnUsers = new List<ReturnUser>();
+
+            using (SqlConnection conn = new SqlConnection(connectionString))
+            {
+
+                conn.Open();
+                                                
+                SqlCommand cmd = new SqlCommand("SELECT users.user_id, users.username, accounts.account_id, accounts.balance FROM users JOIN accounts ON users.user_id = accounts.user_id", conn);
+                // cmd.Parameters.AddWithValue("@user_id", userId);
+
+                SqlDataReader reader = cmd.ExecuteReader();
+
+                while (reader.Read())
+                {                                        
+
+                    ReturnUser user = GetUserFromReader(reader);
+
+                    returnUsers.Add(user);
+
+                }
+
+            }
+            return returnUsers;
+        }
+
+        // check balance is greater than 0, deduct transfer amount from sender, deposit trasnfer amt to receiver
+
+        public bool BalanceIsSufficient(string username, decimal amtToTransfer)
+        {
+            ReturnUser user = GetReturnUser(username);
+            return user.AccountBalance >= amtToTransfer;
+
+        }
     }
 }
+
