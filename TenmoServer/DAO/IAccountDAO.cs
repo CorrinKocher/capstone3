@@ -11,5 +11,9 @@ namespace TenmoServer.DAO
         ReturnUser GetReturnUser(string username);
 
         List<ReturnUser> ListOfUsers();
+
+        List<Transfer> ListOfTransfers(int accountId);
+
+        Transfer GetTransferDetails(int transferId);
     }
 }

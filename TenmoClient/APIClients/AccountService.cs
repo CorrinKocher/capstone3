@@ -35,6 +35,7 @@ namespace TenmoClient.APIClients
         {
             RestRequest request = new RestRequest(BASE_URL + "/" + username);
 
+            //ReturnUser response = client.Get<ReturnUser>(request);
             var response = client.Get<API_Account>(request);
 
 
@@ -84,17 +85,56 @@ namespace TenmoClient.APIClients
             }
             else
             {
-                Console.WriteLine("The Transfer was successful.");
-                RestRequest request = new RestRequest(BASE_URL + "/" + username);
-                API_Transfer thisTransfer = transfer;
+                
+                RestRequest request = new RestRequest(BASE_URL + "/maketransfer/" + username);
+                //API_Transfer thisTransfer = transfer;
                 request.AddJsonBody(transfer);
-                var response = client.Post<API_Account>(request);
+                IRestResponse<API_Transfer> response = client.Post<API_Transfer>(request);
+                //Put in an if
+                Console.WriteLine("The Transfer was successful.");
 
                 isSufficient = true;
             }
             return isSufficient;
         }
 
+        public List<API_Transfer> GetListOfTransfers(int accountId)
+        {
+
+            RestRequest request = new RestRequest(BASE_URL + "/transferlist/" + accountId); 
+            IRestResponse<List<API_Transfer>> response = client.Get<List<API_Transfer>>(request);
+
+
+            if (response.IsSuccessful && response.ResponseStatus == ResponseStatus.Completed)
+            {
+                return response.Data;
+            }
+            else
+            {
+                Console.WriteLine("An error occurred fetching the list of transfers");
+
+                return null;
+            }
+        }
+
+        public API_Transfer GetTransferDetails(int transferId)
+        {
+            RestRequest request = new RestRequest(BASE_URL + "/transfers/" + transferId);
+
+            var response = client.Get<API_Transfer>(request);
+
+
+            if (response.IsSuccessful && response.ResponseStatus == ResponseStatus.Completed)
+            {
+                return response.Data;
+            }
+            else
+            {
+                Console.WriteLine("An error occurred fetching the transfer");
+
+                return null;
+            }
+        }
 
     }
 }

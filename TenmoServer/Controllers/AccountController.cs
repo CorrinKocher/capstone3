@@ -11,15 +11,16 @@ namespace TenmoServer.Controllers
 {
     [Route("[controller]")]
     [ApiController]
-    [Authorize]
+    //[Authorize]
     public class AccountController : ControllerBase
     {
-        private readonly IAccountDAO accountDAO; 
+        private readonly IAccountDAO accountDAO;
         private readonly ITransferDAO transferDAO;
 
-        public AccountController(IAccountDAO accountDAO)
+        public AccountController(IAccountDAO accountDAO, ITransferDAO transferDAO)
         {
             this.accountDAO = accountDAO;
+            this.transferDAO = transferDAO;
         }
 
         [HttpGet("{username}")]
@@ -38,20 +39,36 @@ namespace TenmoServer.Controllers
             return Ok(user);
         }
 
-        
+
         [HttpGet]
 
         public ActionResult<List<ReturnUser>> ListOfAccounts()
         {
-         return this.accountDAO.ListOfUsers();
-                        
+            return this.accountDAO.ListOfUsers();
+
         }
 
-        [HttpPost]
+        [HttpPost("maketransfer/{username}")]
 
-        public ActionResult<Transfer> InsertTransfer(int sendingAccountId, int receivingAccountId, decimal amtToTransfer, int transferType = 1001, int transferStatus = 2001)
+        public void InsertTransfer(Transfer transfer)
         {
-            return this.transferDAO.TransferMoney(sendingAccountId, receivingAccountId, amtToTransfer, transferType, transferStatus);
+            this.transferDAO.TransferMoney(transfer.SendingAccount, transfer.ReceivingAccount, transfer.AmountToTransfer);
         }
+
+        //Need http get for list of transfers
+        [HttpGet("transferlist/{accountId}")] //accounts/accountId{Id}
+        public ActionResult<List<Transfer>> ListTransfers(int accountId)
+        {
+            return this.accountDAO.ListOfTransfers(accountId);
+        }
+
+        // need http get for specific transfer
+        [HttpGet("transfers/{transferId}")] //accounts/transferId{Id}
+        public ActionResult<Transfer> GetTransferDetails(int transferId)
+        {
+            return this.accountDAO.GetTransferDetails(transferId);
+        }
+
+        
     }
 }

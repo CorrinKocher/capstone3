@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.Design;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
@@ -10,7 +11,7 @@ namespace TenmoServer.DAO
     public class AccountDAO : IAccountDAO
     {
         private readonly string connectionString;
-        
+
 
         public AccountDAO(string dbConnectionString)
         {
@@ -63,14 +64,14 @@ namespace TenmoServer.DAO
             {
 
                 conn.Open();
-                                                
+
                 SqlCommand cmd = new SqlCommand("SELECT users.user_id, users.username, accounts.account_id, accounts.balance FROM users JOIN accounts ON users.user_id = accounts.user_id", conn);
                 // cmd.Parameters.AddWithValue("@user_id", userId);
 
                 SqlDataReader reader = cmd.ExecuteReader();
 
                 while (reader.Read())
-                {                                        
+                {
 
                     ReturnUser user = GetUserFromReader(reader);
 
@@ -89,6 +90,73 @@ namespace TenmoServer.DAO
             ReturnUser user = GetReturnUser(username);
             return user.AccountBalance >= amtToTransfer;
 
+        }
+
+        private Transfer GetListOfTransfers(SqlDataReader reader)
+        {
+            return new Transfer()
+            {
+                SendingAccount = Convert.ToInt32(reader["account_from"]),
+                ReceivingAccount = Convert.ToInt32(reader["account_to"]),
+                AmountToTransfer = Convert.ToDecimal(reader["amount"]),
+                TransferStatus = Convert.ToInt32(reader["transfer_status_id"]),
+                TransferType = Convert.ToInt32(reader["transfer_type_id"]),
+                TransferID = Convert.ToInt32(reader["transfer_id"])
+            };
+
+        }
+
+        public List<Transfer> ListOfTransfers(int accountId)
+        {
+            List<Transfer> transferList = new List<Transfer>();
+
+            using (SqlConnection conn = new SqlConnection(connectionString))
+            {
+                conn.Open();
+
+                SqlCommand cmd = new SqlCommand("SELECT transfers.transfer_id, transfers.transfer_type_id, transfers.transfer_status_id, transfers.account_to, transfers.amount " +
+                                                " FROM transfers " +
+                                                " WHERE transfers.account_from = @accountId ", conn);
+                cmd.Parameters.AddWithValue("@accountId", accountId);
+
+                SqlDataReader reader = cmd.ExecuteReader();
+
+                while (reader.Read())
+                {
+                    Transfer transfer = GetListOfTransfers(reader);
+
+                    transferList.Add(transfer);
+                }
+                return transferList;
+
+            }
+
+        }
+
+        public Transfer GetTransferDetails(int transferId)
+        {
+            Transfer transfer = new Transfer();
+
+            using (SqlConnection conn = new SqlConnection(connectionString))
+            {
+                conn.Open();
+
+                SqlCommand cmd = new SqlCommand("SELECT transfers.transfer_id, transfers.transfer_type_id, transfers.transfer_status_id, transfers.account_to, transfers.amount " +
+                                                " FROM transfers " +
+                                                " WHERE transfers.transfer_id = @transferId ", conn);
+                cmd.Parameters.AddWithValue("@transferId", transferId);
+
+                SqlDataReader reader = cmd.ExecuteReader();
+
+                if (reader.HasRows)
+                {
+                    reader.Read();
+
+
+                    return GetListOfTransfers(reader);
+                }
+                return null;
+            }
         }
     }
 }

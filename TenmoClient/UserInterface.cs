@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Dynamic;
 using TenmoClient.APIClients;
 using TenmoClient.Data;
 
@@ -81,8 +82,9 @@ namespace TenmoClient
                             GetBalance(UserService.Username);
 
                             break;
-                        case 2:
-                            Console.WriteLine("NOT IMPLEMENTED!"); // TODO: Implement me
+                        case 2:                           
+                            GetListOfTransfers();
+                            GetTransferDetails();
                             break;
                         case 3:
                             Console.WriteLine("NOT IMPLEMENTED!"); // TODO: Implement me
@@ -160,15 +162,15 @@ namespace TenmoClient
             {
                 if (account.Username != UserService.Username)
                 {
-                    string accountNameAndUserId = $"{account.UserId} ) Username: {account.Username}";
-                    Console.WriteLine(accountNameAndUserId);
+                    string accountNameAndAccountId = $"{account.AccountId} ) Username: {account.Username}";
+                    Console.WriteLine(accountNameAndAccountId);
                 }
             }
         }
 
         private int SelectUserToReceiveTransfer()
         {
-            Console.WriteLine("Please enter the ID of the user you would like to transfer to (ex: 3000)");
+            Console.WriteLine("Please enter the ID of the user you would like to transfer to (ex: 4000)");
             int userIdSelected = int.Parse(Console.ReadLine());
             return userIdSelected;
         }
@@ -186,7 +188,11 @@ namespace TenmoClient
             int receivingUser = SelectUserToReceiveTransfer();
             decimal amtToTransfer = SelectAmtToTransfer();
             API_Account account = accountService.GetBalance(username);
-            API_Transfer transfer = new API_Transfer(account.AccountId, receivingUser, amtToTransfer);           
+            API_Transfer transfer = new API_Transfer();
+            transfer.SendingAccount = account.AccountId;
+            transfer.ReceivingAccount = receivingUser;
+            transfer.AmountToTransfer = amtToTransfer;
+
             isSufficient = accountService.RequestToTransferToAnotherAccount(username, amtToTransfer, transfer);
             while (!isSufficient)
             {
@@ -195,6 +201,31 @@ namespace TenmoClient
             }
 
         }
-    
+
+        private void GetListOfTransfers()
+        {
+            API_Account Sender = accountService.GetBalance(UserService.Username);
+            List<API_Transfer> transfers = accountService.GetListOfTransfers(Sender.AccountId);
+            foreach (API_Transfer transfer in transfers)
+            {
+               
+                    string transferDetailsString = $"{transfer.TransferId} ) Transfer To: {transfer.ReceivingAccount} Transfer amount: {transfer.AmountToTransfer} Transfer status: {transfer.TransferStatus}";
+                    Console.WriteLine(transferDetailsString);
+                
+            }
+        }
+
+        private void GetTransferDetails()
+        {
+            Console.WriteLine("Please enter the transfer ID to view the details of the transfer");
+
+            API_Transfer transfer = new API_Transfer();
+
+            transfer.TransferId = int.Parse(Console.ReadLine());
+            accountService.GetTransferDetails(transfer.TransferId);
+
+
+        }
+
     }
 }

@@ -4,18 +4,18 @@ using System.Text;
 
 namespace TenmoClient.Data
 {
-    public class API_Account
+
+    public class ReturnUser
     {
         public int UserId { get; set; }
-
         public string Username { get; set; }
-
+        //public string Role { get; set; }
         public string Token { get; set; }
 
         public int AccountId { get; set; }
 
         public decimal AccountBalance { get; set; }
 
-        public int TransferID { get; set; }
     }
+
 }
