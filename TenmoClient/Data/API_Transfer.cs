@@ -20,6 +20,16 @@ namespace TenmoClient.Data
 
         public int TransferId { get; set; }
 
+        public int TransferType { get; set; }
+
+        public string typeName { get; set; }
+
+        public string StatusName { get; set; }
+
+        public string ReceivingAccountName { get; set; }
+
+
+
 
 
     }

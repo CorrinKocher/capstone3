@@ -16,12 +16,21 @@ namespace TenmoServer.Models
 
         public int TransferStatus { get; set; } = 2001;
 
+        public int SenderUserId { get; set; }
+
+        public int ReceiverUserId { get; set; }
+
+        public int TransferId { get; set; }
+
         public int TransferType { get; set; } = 1001;
 
-        public int TransferID { get; set; }
+        public string typeName { get; set; }
 
-        
+        public string StatusName { get; set; }
 
-      
+        public string ReceivingAccountName { get; set; }
+
+
+
     }
 }

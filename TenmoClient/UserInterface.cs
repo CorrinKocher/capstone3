@@ -82,9 +82,9 @@ namespace TenmoClient
                             GetBalance(UserService.Username);
 
                             break;
-                        case 2:                           
+                        case 2:
                             GetListOfTransfers();
-                            GetTransferDetails();
+
                             break;
                         case 3:
                             Console.WriteLine("NOT IMPLEMENTED!"); // TODO: Implement me
@@ -92,7 +92,7 @@ namespace TenmoClient
                         case 4:
                             GetListOfUsers();
                             TransferMoney(UserService.Username);
-                            
+
 
                             break;
                         case 5:
@@ -208,24 +208,34 @@ namespace TenmoClient
             List<API_Transfer> transfers = accountService.GetListOfTransfers(Sender.AccountId);
             foreach (API_Transfer transfer in transfers)
             {
-               
-                    string transferDetailsString = $"{transfer.TransferId} ) Transfer To: {transfer.ReceivingAccount} Transfer amount: {transfer.AmountToTransfer} Transfer status: {transfer.TransferStatus}";
-                    Console.WriteLine(transferDetailsString);
-                
+
+                string transferDetailsString = $"{transfer.TransferId} ) Transfer To: {transfer.ReceivingAccountName} Transfer amount: ${transfer.AmountToTransfer}";
+                Console.WriteLine(transferDetailsString);
+
             }
-        }
-
-        private void GetTransferDetails()
-        {
             Console.WriteLine("Please enter the transfer ID to view the details of the transfer");
+            int selectedTransfer = int.Parse(Console.ReadLine());
+            API_Transfer transferToDisplay = accountService.GetTransferDetails(selectedTransfer);
 
-            API_Transfer transfer = new API_Transfer();
-
-            transfer.TransferId = int.Parse(Console.ReadLine());
-            accountService.GetTransferDetails(transfer.TransferId);
-
-
+            string transferDetails = $" ID: {transferToDisplay.TransferId} \n FROM: {UserService.Username} " +
+                $"\n TO:{transferToDisplay.ReceivingAccount} \n Type: {transferToDisplay.typeName} \n Status: {transferToDisplay.StatusName} " +
+                $"\n Amount: ${transferToDisplay.AmountToTransfer}  ";
+            Console.WriteLine(transferDetails);
         }
+
+        //private void GetTransferDetails()
+        //{
+        //    Console.WriteLine("Please enter the transfer ID to view the details of the transfer");
+
+        //    API_Transfer transfer = new API_Transfer();
+
+        //    transfer.TransferId = int.Parse(Console.ReadLine());
+
+
+        //    accountService.GetTransferDetails(transfer.TransferId);
+
+
+        //}
 
     }
 }
